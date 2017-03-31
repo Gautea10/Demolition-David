@@ -16,7 +16,8 @@ var loadState = {
         game.load.image("bg1","Sprites/BakgrunnDD.png");
         game.load.image("bg2","Sprites/BakgrunnDD2.png");
         game.load.image("portal","Sprites/Portal.png");
-        game.load.image("targetBuilding","Sprites/targetBuilding.png"/*,636,677*/);
+        game.load.image("targetBuilding","Sprites/targetBuilding.png");
+		game.load.image("penger","Sprites/Penger.png");
         
 		game.load.spritesheet("ledge","Sprites/ledge.png",149, 70);
         game.load.spritesheet("startButton","Sprites/start.png",770,659);

@@ -1,10 +1,11 @@
 var cursors;
-var enemyPos;
 var ground;
 var posX = 0;
 var mapLen = 24000; 
 var playerPos = 100;
 var randomNum;
+var score = 0;
+//var scoretext;
 
 var playState = {
 	
@@ -98,11 +99,18 @@ var playState = {
         tBuilding.scale.setTo(0.8,0.8);
         tBuilding.animations.add("buildingAni",[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14], 10, true);
 		
+		//Score
+		scoreText = game.add.text(20, 20, 'Paycheck: 0', {fontSize: '30px', fill: '#ffffff'});
+		scoreText.fixedToCamera = true;
+    	scoreText.cameraOffset.setTo(10, 10);
+		
+		this.spawnMoney();
 		this.spawnLedges();
         this.createUmbrellaGirl1();
 		this.createUmbrellaGirl2();
         this.createSpartan();
         this.changeToModern();
+		
         cursors = game.input.keyboard.createCursorKeys();
 	},
     
@@ -112,9 +120,36 @@ var playState = {
     	style = 'STYLE_LOCKON';
 	},
     
-    randomIntFromInterval: function(min,max){
+	spawnMoney: function() {
+		console.log("lag penge");
+		money = game.add.group();
+		money.enableBody = true;
+	
+		for(var i = 0; i < 15; i++) {
+			var moneyPos = this.randomIntFromInterval(3000, 22000);
+			var spawnMoney = money.create(moneyPos, 10, "penger");
+
+			spawnMoney.body.gravity.y = 800;
+			spawnMoney.body.setSize(30, 30);
+			spawnMoney.anchor.setTo(0.5,0.5);
+
+			//Gives the money a slightly random bounce value
+			spawnMoney.body.bounce.y = 0,5 + Math.random() * 0.2;
+			
+			//clearInterval(interval);
+		}
+	},
+	
+	randomIntFromInterval: function(min,max){
         return Math.floor(Math.random()*(max-min+1)+min);
     },
+	
+	collectMoney: function (player, money) {
+    	//fjerner stjernen fra skjermen
+    	money.kill();
+		score += 10;	
+		scoreText.text = "Paycheck: " + score + "$";
+	},
 	
     changeToModern: function() {
         posX = 0;
@@ -209,69 +244,10 @@ var playState = {
 					ledge2.animations.play("ledgeAni");
 					ledge3.animations.play("ledgeAni");		
             	}, 10);
-				
             }
         }
-		
-		//spawnLedge = 19150
-		
-		while (true) {
-			spawnLedge += 400
-			var pixlePos2 = 19500;
-			
-			if (spawnLedge > pixlePos2) {
-            //for (i = 0; i < 1; i++) {
-
-                // Bestemmer posisjon y innenfor en viss grense slik at player rekker opp til de
-                var randomYPos = this.randomIntFromInterval(300,500);
-                spawnLedge += this.randomIntFromInterval(0,100);
-                console.log(spawnLedge);
-                 
-                // gjør størrelse y random innen en viss grense        
-
-                if (spawnLedge <= pixlePos2 + 520) {
-                    ledge4 = platforms.create(spawnLedge, 450, "ledge");               
-                    ledge4.anchor.setTo(1,0);
-                    game.physics.enable(ledge4);
-					ledge4.body.immovable = true;
-                    ledge4.body.setSize(158,10);
-					ledge4.animations.add("ledgeAni",[0,1,2,3], 20, true);
-   
-                }
-                else if(spawnLedge <= pixlePos2 + 1020) {
-                    console.log("mellonledge lagde");
-                    ledge5 = platforms.create(spawnLedge, 375, "ledge");                    
-                    ledge5.anchor.setTo(1,0);
-                    game.physics.enable(ledge5);
-					ledge5.body.immovable = true;
-                    ledge5.body.setSize(158,10);
-					ledge5.animations.add("ledgeAni",[0,1,2,3], 20, true);
-                }
-                else if(spawnLedge > pixlePos2 + 1020) {
-                    ledge6 = platforms.create(spawnLedge + 20, randomYPos, "ledge");                   
-                    ledge6.anchor.setTo(1,0);
-                    game.physics.enable(ledge6);
-					ledge6.body.immovable = true;
-                    ledge6.body.setSize(158,10);
-					ledge6.animations.add("ledgeAni",[0,1,2,3], 20, true);
-                }
-
-                // Vis ledges starter å bli laget utenfor lengden på banen, stopp å lag dem
-                if (spawnLedge > 20500) {
-                    break;
-                }
-				
-				ledge.animations.add("ledgeAni",[0,1,2,3], 20, true);
-				
-				var interval2 = setInterval(function(){ 
-					//ledge4 not defined error <---------------------------------------------------
-                    ledge4.animations.play("ledgeAni");
-					ledge5.animations.play("ledgeAni");
-					ledge6.animations.play("ledgeAni");		
-            	}, 10);	
-            }
-		}
 	},
+	
 	
 	changeToGreece: function() {
 		posX = 0;
@@ -306,7 +282,7 @@ var playState = {
     
     createUmbrellaGirl1: function() {
 		console.log("createUmbrellaGirl1 kjørte");
-		enemyPos =  this.randomIntFromInterval(2000, 6000);
+		var enemyPos =  this.randomIntFromInterval(2000, 6000);
         console.log("enemy1: " + enemyPos);
         
         
@@ -322,7 +298,7 @@ var playState = {
     
 	createUmbrellaGirl2: function() {
 		console.log("createUmbrellaGirl2 kjørte")
-		enemyPos2 =  this.randomIntFromInterval(18000, 22000);
+		var enemyPos2 =  this.randomIntFromInterval(18000, 22000);
 		console.log("enemy2: " + enemyPos2);
 		
 		enemy2 = game.add.sprite(enemyPos2, 300, "umbrellaGirl");	
@@ -330,14 +306,13 @@ var playState = {
         game.physics.arcade.enable(enemy2);
         //enemy2.body.immovable = true;
         enemy2.animations.add("enemyAni2",[0,1,2,3], 6, true);
-        enemy2.body.gravity.y = 800;
 		enemy2.body.collideWorldBounds = true;
         enemy2.body.setSize(30, 60);
 	},
 	
      createSpartan: function() {
 		 //console.log("createSpartan kjørte");
-         enemyPos3 = this.randomIntFromInterval(10000, 14000);
+         var enemyPos3 = this.randomIntFromInterval(10000, 14000);
          console.log("enemy3: " + enemyPos3);
          
          enemy3 = game.add.sprite(enemyPos3, 400, "spartan");
@@ -356,6 +331,9 @@ var playState = {
         game.physics.arcade.collide(enemy2,platforms);
         game.physics.arcade.collide(enemy3,platforms);
         game.physics.arcade.collide(tBuildingHitbox, platforms);
+
+		game.physics.arcade.collide(money, platforms);
+		game.physics.arcade.overlap(player, money, this.collectMoney, null);
         
         player.body.velocity.x = 520;
         //console.log(frameExplode);
@@ -386,6 +364,7 @@ var playState = {
 			portal2.kill();
             platforms.removeAll(true);
 			this.changeToModern();
+			enemy2.body.gravity.y = 800;
         }
         
         if (game.physics.arcade.collide(tBuildingHitbox, player)) {
