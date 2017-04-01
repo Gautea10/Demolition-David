@@ -6,6 +6,10 @@ var winState = {
 		var winLabel = game.add.text(80, 80, 'You Won!',{
 			font: "50px Arial", fill: "#FFFFFF"
 		});
+		var pay = game.add.text(80, 130, 'Paycheck: ' 
+									 + score + "$",{
+			font: "50px Arial", fill: "#FFFFFF"
+		});
 		
 		var startLabel = game.add.text(80, game.world.height-80, 
 									   'press "W" to restart',{

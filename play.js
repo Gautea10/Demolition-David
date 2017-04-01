@@ -5,17 +5,15 @@ var mapLen = 24000;
 var playerPos = 100;
 var randomNum;
 var score = 0;
+var emitter;
+var emitter2;
 //var scoretext;
 
 var playState = {
 	
 	create: function() {
-        console.log("Play kjørte");
-        
-        var testTall = Math.floor(Math.random() * ((10-5)+1) + 5);
-        var testTall2 = this.randomIntFromInterval(9000, 15000);
-        console.log("testTall1: " + testTall);
-        console.log("testTall2: " + testTall2);
+		score = 0;
+        //console.log("Play kjørte");
 		
         // Make game here
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -104,7 +102,15 @@ var playState = {
 		scoreText.fixedToCamera = true;
     	scoreText.cameraOffset.setTo(10, 10);
 		
-		this.spawnMoney();
+		//this.money = game.add.group();
+		
+		emitter = game.add.emitter(game.world.centerX, 0, 400);
+		emitter.width = game.world.width;
+		
+		emitter2 = game.add.emitter(game.world.centerX, 0, 400);
+		emitter2.width = game.world.width;
+		
+		//this.spawnMoney();
 		this.spawnLedges();
         this.createUmbrellaGirl1();
 		this.createUmbrellaGirl2();
@@ -120,42 +126,54 @@ var playState = {
     	style = 'STYLE_LOCKON';
 	},
     
+	/*
 	spawnMoney: function() {
 		console.log("lag penge");
-		money = game.add.group();
-		money.enableBody = true;
+		this.money = game.add.group();
+		this.money.enableBody = true;
+		
+		this.newMoney = 0;
+		this.moneyDelay = 1000;
 	
-		for(var i = 0; i < 15; i++) {
-			var moneyPos = this.randomIntFromInterval(3000, 22000);
-			var spawnMoney = money.create(moneyPos, 10, "penger");
+		var moneyPos = this.randomIntFromInterval(3000, 22000);
+		var spawnMoney = this.money.create(moneyPos, 10, "penger");
+		
+		spawnMoney.body.gravity.y = 800;
+		spawnMoney.body.setSize(30, 30);
+		spawnMoney.anchor.setTo(0.5,0.5);
 
-			spawnMoney.body.gravity.y = 800;
-			spawnMoney.body.setSize(30, 30);
-			spawnMoney.anchor.setTo(0.5,0.5);
-
-			//Gives the money a slightly random bounce value
-			spawnMoney.body.bounce.y = 0,5 + Math.random() * 0.2;
-			
-			//clearInterval(interval);
-		}
-	},
+		//Gives the money a slightly random bounce value
+		spawnMoney.body.bounce.y = 0,5 + Math.random() * 0.2;
+		
+					
+	},*/
 	
 	randomIntFromInterval: function(min,max){
         return Math.floor(Math.random()*(max-min+1)+min);
     },
 	
 	collectMoney: function (player, money) {
-    	//fjerner stjernen fra skjermen
-    	money.kill();
+		
 		score += 10;	
 		scoreText.text = "Paycheck: " + score + "$";
 	},
 	
     changeToModern: function() {
         posX = 0;
-        console.log("lager gress");
-        
+        //console.log("lager gress");
 		platforms.enableBody = true;
+		
+		emitter.makeParticles("penger");
+		emitter.setYSpeed(300, 400);
+		emitter.start(false, 1600, 2, 0);
+		
+		emitter2.on = false;
+		
+		if (player.body.position.y < 7800 || player.body.position > 16200) {
+			emitter.on = true;
+        } 
+	
+		game.physics.arcade.enable(emitter);
         
 		while (true) {
             randomNum = this.randomIntFromInterval(0, 10);
@@ -183,7 +201,6 @@ var playState = {
 			} 
 		}
     },
-	
 	
 	spawnLedges: function() {
 		console.log("Spawnledges kjørte");
@@ -252,8 +269,19 @@ var playState = {
 	changeToGreece: function() {
 		posX = 0;
         platforms.removeAll(true);
-		console.log("lager sand");
-        
+		
+		emitter2.makeParticles("penger2");
+		emitter2.setYSpeed(300, 400);
+		emitter2.start(false, 1600, 2, 0);
+		game.physics.arcade.enable(emitter2);
+		
+		emitter.on = false;
+		
+		if (player.body.position.y > 8200 && player.body.position < 15800) {
+			emitter2.on = true;
+        } 
+		
+		//console.log("lager sand");
 		while (true) {
 			ground.loadTexture("groundSand", 0);
 			ground = platforms.create(posX, 535,"ground");
@@ -281,11 +309,10 @@ var playState = {
 	},
     
     createUmbrellaGirl1: function() {
-		console.log("createUmbrellaGirl1 kjørte");
+		//console.log("createUmbrellaGirl1 kjørte");
 		var enemyPos =  this.randomIntFromInterval(2000, 6000);
-        console.log("enemy1: " + enemyPos);
-        
-        
+        //console.log("enemy1: " + enemyPos);
+         
         enemy = game.add.sprite(enemyPos, 300, "umbrellaGirl");	
         enemy.anchor.setTo(0.5, 0.5);
         game.physics.arcade.enable(enemy);
@@ -297,9 +324,9 @@ var playState = {
 	},
     
 	createUmbrellaGirl2: function() {
-		console.log("createUmbrellaGirl2 kjørte")
+		//console.log("createUmbrellaGirl2 kjørte")
 		var enemyPos2 =  this.randomIntFromInterval(18000, 22000);
-		console.log("enemy2: " + enemyPos2);
+		//console.log("enemy2: " + enemyPos2);
 		
 		enemy2 = game.add.sprite(enemyPos2, 300, "umbrellaGirl");	
         enemy2.anchor.setTo(0.5, 0.5);
@@ -313,7 +340,7 @@ var playState = {
      createSpartan: function() {
 		 //console.log("createSpartan kjørte");
          var enemyPos3 = this.randomIntFromInterval(10000, 14000);
-         console.log("enemy3: " + enemyPos3);
+         //console.log("enemy3: " + enemyPos3);
          
          enemy3 = game.add.sprite(enemyPos3, 400, "spartan");
          enemy3.anchor.setTo(0.5, 1);
@@ -326,14 +353,16 @@ var playState = {
 	},
      
 	update: function() {
-        game.physics.arcade.collide(player,platforms);
-        game.physics.arcade.collide(enemy,platforms);
-        game.physics.arcade.collide(enemy2,platforms);
-        game.physics.arcade.collide(enemy3,platforms);
+        game.physics.arcade.collide(player, platforms);
+        game.physics.arcade.collide(enemy, platforms);
+        game.physics.arcade.collide(enemy2, platforms);
+        game.physics.arcade.collide(enemy3, platforms);
         game.physics.arcade.collide(tBuildingHitbox, platforms);
-
-		game.physics.arcade.collide(money, platforms);
-		game.physics.arcade.overlap(player, money, this.collectMoney, null);
+		game.physics.arcade.collide(this.money, platforms);
+		game.physics.arcade.overlap(player, emitter, this.collectMoney, null, this);
+		game.physics.arcade.overlap(player, emitter2, this.collectMoney, null, this);
+		game.physics.arcade.collide(emitter, platforms);
+		game.physics.arcade.collide(emitter2, platforms);
         
         player.body.velocity.x = 520;
         //console.log(frameExplode);
@@ -400,7 +429,7 @@ var playState = {
 			enemy.kill();
         }
         if (enemy2.body.position.y >= 525) {
-			console.log("enemy2 died");
+			//console.log("enemy2 died");
 			enemy2.kill();
         }
         if (enemy3.body.position.y >= 525) {
@@ -415,7 +444,7 @@ var playState = {
 	},
     
 	win: function() { 
-        console.log("win kjørte");
+        //console.log("win kjørte");
         game.state.start("win"); 
 	},
 }
